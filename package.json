@@ -1,0 +1,22 @@
+{
+  "name": "mill-line-server",
+  "version": "1.0.0",
+  "description": "Multi-user production monitor for an oil mill, with passkey (fingerprint/Face ID) login and PIN fallback, backed by PostgreSQL.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@simplewebauthn/server": "^9.0.3",
+    "bcryptjs": "^2.4.3",
+    "connect-pg-simple": "^9.0.1",
+    "decimal.js": "^10.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "multer": "^2.0.1",
+    "pg": "^8.12.0"
+  }
+}

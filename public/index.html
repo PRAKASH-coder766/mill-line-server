@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mill Line — Production Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="login-wrap" id="loginScreen">
+  <div class="login-card">
+    <div class="tag" style="margin-bottom:4px;">mill line</div>
+    <h1>Sign in</h1>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="login-username" autocomplete="username" placeholder="e.g. rmehta">
+    </div>
+
+    <div id="pinBlock">
+      <div class="field">
+        <label>PIN</label>
+        <input type="password" id="login-pin" inputmode="numeric" autocomplete="current-password" placeholder="••••••">
+      </div>
+      <button class="btn" style="width:100%;" onclick="loginWithPin()">Sign in with PIN</button>
+    </div>
+
+    <div class="or-divider"><span>or</span></div>
+    <button class="btn secondary-btn" style="width:100%;" onclick="loginWithPasskey()">Use fingerprint / Face ID</button>
+
+    <div class="login-error" id="loginError"></div>
+    <div class="hint" style="margin-top:16px;text-align:center;">
+      New device? Sign in with your PIN once, then add a passkey from your profile menu.
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP (hidden until logged in) ===== -->
+<div class="app" id="appRoot" style="display:none;">
+
+  <div class="head">
+    <div class="brand">
+      <h1>Kayal Agro Foods</h1>
+      <div class="tag">trace mechanism · raw material → processing → quality → dispatch</div>
+    </div>
+    <div class="who-bar">
+      <div class="global-search-wrap" style="position:relative;">
+        <input type="text" id="globalSearchInput" placeholder="Search quotations, POs, orders, customers…" style="width:260px;padding:8px 10px;border:1px solid var(--line);font-family:'IBM Plex Sans',sans-serif;font-size:13px;" oninput="onGlobalSearchInput(this.value)" onfocus="onGlobalSearchInput(this.value)">
+        <div id="globalSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--line);z-index:50;max-height:340px;overflow-y:auto;"></div>
+      </div>
+      <div class="notif-bell-wrap" style="position:relative;">
+        <button class="btn secondary-btn small" onclick="toggleNotificationDropdown()">🔔 <span id="notifBadge" style="display:none;background:#b33;color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;margin-left:2px;">0</span></button>
+        <div id="notifDropdown" style="display:none;position:absolute;top:100%;right:0;width:340px;background:var(--white);border:1px solid var(--line);z-index:50;max-height:400px;overflow-y:auto;padding:10px;"></div>
+      </div>
+      <div class="who">
+        <span id="whoName"></span>
+        <span class="role-pill" id="whoRole"></span>
+      </div>
+      <button class="btn secondary-btn small" onclick="showAddPasskey()">Add passkey</button>
+      <button class="btn secondary-btn small" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+
+  <div id="mfaNagBanner" style="display:none;background:#fff3cd;border:1px solid #e0c36a;padding:10px 16px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;">
+    ⚠️ Your account (Admin/Management) should have a passkey for secure sign-in, but doesn't yet.
+    <span class="del" onclick="showAddPasskey()">Add one now</span>
+  </div>
+
+  <div class="stations" id="stations">
+    <button class="station" data-tab="mytasks"><span class="num">00</span>My Tasks</button>
+    <button class="station" data-tab="overview"><span class="num">01</span>Overview</button>
+    <button class="station" data-tab="sourcing"><span class="num">02</span>Sourcing</button>
+    <button class="station" data-tab="processing"><span class="num">03</span>Processing</button>
+    <button class="station" data-tab="uridpreproc"><span class="num">04</span>Urid Pre-Proc</button>
+    <button class="station" data-tab="uriddhall"><span class="num">05</span>Urid Dhall</button>
+    <button class="station" data-tab="quality"><span class="num">06</span>Quality</button>
+    <button class="station" data-tab="packing"><span class="num">07</span>Packing</button>
+    <button class="station" data-tab="dispatch"><span class="num">08</span>Dispatch</button>
+    <button class="station" data-tab="trace"><span class="num">09</span>Trace</button>
+    <button class="station admin-only" data-tab="catalog"><span class="num">10</span>Catalog</button>
+    <button class="station admin-only" data-tab="exportsetup"><span class="num">11</span>Export Setup</button>
+    <button class="station" data-tab="customers"><span class="num">12</span>Customers</button>
+    <button class="station" data-tab="variants"><span class="num">13</span>Products</button>
+    <button class="station" data-tab="pricing"><span class="num">14</span>Pricing</button>
+    <button class="station" data-tab="approvals"><span class="num">15</span>Approvals</button>
+    <button class="station" data-tab="quotations"><span class="num">16</span>Quotations</button>
+    <button class="station" data-tab="customerpos"><span class="num">17</span>Customer POs</button>
+    <button class="station" data-tab="salesorders"><span class="num">18</span>Sales Orders</button>
+    <button class="station" data-tab="documents"><span class="num">19</span>Documents</button>
+    <button class="station" data-tab="notifications"><span class="num">20</span>Notifications</button>
+    <button class="station admin-only" data-tab="users"><span class="num">21</span>Users</button>
+  </div>
+
+
+  <div class="status-note" id="statusNote"></div>
+  <div id="content"></div>
+</div>
+
+<!-- ===== Add passkey modal ===== -->
+<div class="modal-backdrop" id="passkeyModal" style="display:none;">
+  <div class="modal">
+    <h2 style="margin-top:0;">Add a fingerprint / Face ID passkey</h2>
+    <p class="hint">This registers the biometric sensor on the device you're using right now (laptop Windows Hello / Touch ID, or phone Face ID / fingerprint). You'll use it to sign in next time instead of your PIN.</p>
+    <div class="field"><label>Name this device</label><input type="text" id="deviceName" placeholder="e.g. Rahul's iPhone"></div>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button class="btn" onclick="registerPasskey()">Register passkey</button>
+      <button class="btn secondary-btn" onclick="closeModal()">Cancel</button>
+    </div>
+    <div class="login-error" id="passkeyError"></div>
+  </div>
+</div>
+
+<script src="/webauthn-helpers.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

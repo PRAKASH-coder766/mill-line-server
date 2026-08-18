@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: millline
+      POSTGRES_PASSWORD: millline_change_me
+      POSTGRES_DB: millline
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://millline:millline_change_me@db:5432/millline
+      SESSION_SECRET: change-this-to-a-long-random-string
+      ORIGIN: http://localhost:3000
+      RP_ID: localhost
+      RP_NAME: Mill Line
+      PORT: 3000
+      BOOTSTRAP_ADMIN_NAME: Plant Admin
+      BOOTSTRAP_ADMIN_USERNAME: admin
+      BOOTSTRAP_ADMIN_PIN: "246810"
+
+volumes:
+  db_data:
